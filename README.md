@@ -1,4 +1,4 @@
-# adenda-sample-unlock-widget
+# Sample Unlock Widget for the Adenda SDK
 This is an example of a custom unlock widget for the Adenda SDK.
 
 Add the .java files to your source foolder and the .xml files to your resources folder.
