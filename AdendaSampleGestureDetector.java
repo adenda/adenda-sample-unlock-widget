@@ -2,8 +2,6 @@ package com.adenda.knightsanddragons.unlock;
 
 import sdk.adenda.modules.AdendaGlobal;
 import sdk.adenda.widget.AdendaUnlockInterface;
-import sdk.adenda.widget.AdendaUnlockWidget;
-import android.app.Activity;
 import android.content.Context;
 import android.provider.MediaStore;
 import android.support.v4.view.GestureDetectorCompat;
@@ -14,7 +12,7 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 
 public class AdendaSampleGestureDetector extends GestureDetectorCompat 
 {
-	public static AdendaSampleGestureDetector newInstance(Activity context)
+	public static AdendaSampleGestureDetector newInstance(Context context)
 	{
 		AdendaSampleGestureListener listener = new AdendaSampleGestureListener(context);
 		return new AdendaSampleGestureDetector(context, listener);
@@ -34,25 +32,30 @@ public class AdendaSampleGestureDetector extends GestureDetectorCompat
 		return super.onTouchEvent(ev);
 	}
 	
-	public static class AdendaSampleGestureListener extends SimpleOnGestureListener implements AdendaUnlockWidget
+	public void setAdendaUnlockInterface( AdendaUnlockInterface adendaUnlockInterface) {
+		if (mListener != null)
+			mListener.setAdendaUnlockInterface(adendaUnlockInterface);
+	}
+	
+	public static class AdendaSampleGestureListener extends SimpleOnGestureListener
 	{
-		private Activity mActivity;
+		private Context mContext;
 		private DisplayMetrics mScreenMetrics;
 		private int mPendingAction;
 		private AdendaUnlockInterface mAdendaUnlockInterface;
 		
-		public AdendaSampleGestureListener(Activity activity)
+		public AdendaSampleGestureListener(Context context)
 		{
-			this.mActivity = activity;
+			mContext = context;
 			mScreenMetrics = new DisplayMetrics();
-			if (activity != null)
-				((WindowManager) activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(mScreenMetrics);
+			if (context != null)
+				((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(mScreenMetrics);
 			mPendingAction = -1;
-			
-			if (AdendaUnlockInterface.class.isInstance(activity))
-				setAdendaUnlockInterface((AdendaUnlockInterface)activity);
 		}
 		
+		public void setAdendaUnlockInterface( AdendaUnlockInterface adendaUnlockInterface) {
+			mAdendaUnlockInterface = adendaUnlockInterface;
+		}
 		
 		@Override
 	    public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
@@ -73,22 +76,22 @@ public class AdendaSampleGestureDetector extends GestureDetectorCompat
 	        	return false;
 	        
 	        // If it was a swipe up
-	        if (mActivity != null && diffY > 0 && Math.abs(diffX) < Math.abs(diffY))
+	        if (mContext != null && diffY > 0 && Math.abs(diffX) < Math.abs(diffY))
 	        	// Perform unlock action
 	        	simpleUnlock();
 	        
 	        // If it was a swipe down
-	        else if (mActivity != null && diffY < 0 && Math.abs(diffX) < Math.abs(diffY))
+	        else if (mContext != null && diffY < 0 && Math.abs(diffX) < Math.abs(diffY))
 	        	// Launch Google Now
 	        	launchGoogleNow();
 	        
 	        // If it was a swipe left
-	        else if (mActivity != null && diffX > 0 && Math.abs(diffY) < Math.abs(diffX))
+	        else if (mContext != null && diffX > 0 && Math.abs(diffY) < Math.abs(diffX))
 	        	// Launch Camera
 	        	launchCamera();
 	        
 	        // If it was a swipe right
-	        else if (mActivity != null && diffX < 0 && Math.abs(diffY) < Math.abs(diffX))
+	        else if (mContext != null && diffX < 0 && Math.abs(diffY) < Math.abs(diffX))
 	        	// Launch Action
 	        	engageContent();
 	        
@@ -103,7 +106,7 @@ public class AdendaSampleGestureDetector extends GestureDetectorCompat
 		@Override
 	    public boolean onScroll(MotionEvent event1, MotionEvent event2, float distanceX, float distanceY) 
 	    {
-	    	if (mActivity == null || event1 == null || event2 == null)
+	    	if (mContext == null || event1 == null || event2 == null)
 	    		return false;
 	    	
 	    	float diffY = event1.getRawY() - event2.getRawY();
@@ -166,11 +169,6 @@ public class AdendaSampleGestureDetector extends GestureDetectorCompat
 	        if (mPendingAction >= 0)
 	        	triggerAction( mPendingAction);
 	    }
-	    
-	    @Override
-		public void setAdendaUnlockInterface( AdendaUnlockInterface adendaUnlockInterface) {
-			mAdendaUnlockInterface = adendaUnlockInterface;
-		}
 		
 		private void triggerAction(int pendingAction)
 		{
@@ -195,23 +193,27 @@ public class AdendaSampleGestureDetector extends GestureDetectorCompat
 		
 		private void simpleUnlock()
 		{
-			mAdendaUnlockInterface.simpleUnlock();
+			if (mAdendaUnlockInterface != null)
+				mAdendaUnlockInterface.simpleUnlock();
 		}
 		
 		private void launchCamera()
 		{
 			// Launch Camera
-	    	mAdendaUnlockInterface.unlockAndPerformIntent(AdendaGlobal.getActionIntentFromString( mActivity, MediaStore.ACTION_IMAGE_CAPTURE));
+			if (mAdendaUnlockInterface != null)
+				mAdendaUnlockInterface.unlockAndPerformIntent(AdendaGlobal.getActionIntentFromString( mContext, MediaStore.ACTION_IMAGE_CAPTURE));
 		}
 		
 		private void engageContent()
 		{
-			mAdendaUnlockInterface.unlockAndEngage();
+			if (mAdendaUnlockInterface != null)
+				mAdendaUnlockInterface.unlockAndEngage();
 		}
 		
 		private void launchGoogleNow()
 		{
-			mAdendaUnlockInterface.unlockAndPerformIntent(AdendaGlobal.getActionIntentFromString( mActivity, "com.google.android.googlequicksearchbox"));
+			if (mAdendaUnlockInterface != null)
+				mAdendaUnlockInterface.unlockAndPerformIntent(AdendaGlobal.getActionIntentFromString( mContext, "com.google.android.googlequicksearchbox"));
 		}
 	}
 }

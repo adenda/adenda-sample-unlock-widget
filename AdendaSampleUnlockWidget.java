@@ -1,12 +1,14 @@
 package com.adenda.knightsanddragons.unlock;
 
 import com.adenda.knightsanddragons.R;
+
 import sdk.adenda.widget.AdendaUnlockInterface;
 import sdk.adenda.widget.AdendaUnlockWidget;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -50,6 +52,8 @@ public class AdendaSampleUnlockWidget extends RelativeLayout implements AdendaUn
 	@Override
 	public void setAdendaUnlockInterface(AdendaUnlockInterface adendaUnlockInterface) {
 		mAdendaUnlockInterface = adendaUnlockInterface;
+		if (mDetector != null)
+			mDetector.setAdendaUnlockInterface(adendaUnlockInterface);
 	}
 	
 	@Override
@@ -75,5 +79,10 @@ public class AdendaSampleUnlockWidget extends RelativeLayout implements AdendaUn
 			mDetector.onTouchEvent(event);		
        
         return true;
+	}
+
+	@Override
+	public void onNewImpression() {
+		Log.d(getClass().getSimpleName(), "Impression Recorded");
 	}
 }
