@@ -3,18 +3,14 @@ package com.adenda.knightsanddragons.unlock;
 import sdk.adenda.modules.AdendaGlobal;
 import sdk.adenda.widget.AdendaUnlockInterface;
 import sdk.adenda.widget.AdendaUnlockWidget;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
 import android.provider.MediaStore;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.WindowManager;
 import android.view.GestureDetector.SimpleOnGestureListener;
-import android.view.animation.AlphaAnimation;
 
 public class AdendaSampleGestureDetector extends GestureDetectorCompat 
 {
@@ -171,28 +167,7 @@ public class AdendaSampleGestureDetector extends GestureDetectorCompat
 	        	triggerAction( mPendingAction);
 	    }
 	    
-	    @SuppressLint("NewApi")
-		private void setAlpha (View view, float alpha)
-	    {
-	    	if (view == null)
-	    		return;
-	    	
-	    	// Make sure view is visible
-	    	view.setVisibility(View.VISIBLE);
-	    	if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) 		
-	    		view.setAlpha(alpha);
-	    	else
-	    	{
-	    		view.setVisibility(View.VISIBLE);
-	    		AlphaAnimation alphaAnim = new AlphaAnimation(alpha, alpha);
-	    		alphaAnim.setDuration(0); // Make animation instant
-	    		alphaAnim.setFillAfter(true); // Tell it to persist after the animation ends
-	    		view.startAnimation(alphaAnim);
-	    	}
-	    }
-
-
-		@Override
+	    @Override
 		public void setAdendaUnlockInterface( AdendaUnlockInterface adendaUnlockInterface) {
 			mAdendaUnlockInterface = adendaUnlockInterface;
 		}
