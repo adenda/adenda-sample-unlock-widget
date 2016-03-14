@@ -7,6 +7,7 @@ import sdk.adenda.widget.AdendaUnlockWidget;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +19,8 @@ import android.widget.RelativeLayout;
 public class AdendaSampleUnlockWidget extends RelativeLayout implements AdendaUnlockWidget
 {
 	private AdendaUnlockInterface mAdendaUnlockInterface;
-	private AdendaSampleGestureDetector mDetector;
+	private GestureDetectorCompat mDetector;
+	private AdendaSampleGestureListener mListener;
 	private Context mContext;
 
 	public AdendaSampleUnlockWidget(Context context) {
@@ -46,14 +48,17 @@ public class AdendaSampleUnlockWidget extends RelativeLayout implements AdendaUn
 		LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    inflater.inflate(R.layout.adenda_sample_unlock_layout, this);
 	    if (Activity.class.isInstance(mContext))
-	    	mDetector = AdendaSampleGestureDetector.newInstance((Activity)mContext);
+	    {
+	    	mListener = new AdendaSampleGestureListener(mContext);
+	    	mDetector = new GestureDetectorCompat(mContext, mListener);
+	    }
 	}
 
 	@Override
 	public void setAdendaUnlockInterface(AdendaUnlockInterface adendaUnlockInterface) {
 		mAdendaUnlockInterface = adendaUnlockInterface;
-		if (mDetector != null)
-			mDetector.setAdendaUnlockInterface(adendaUnlockInterface);
+		if (mListener != null)
+			mListener.setAdendaUnlockInterface(adendaUnlockInterface);
 	}
 	
 	@Override
@@ -69,12 +74,21 @@ public class AdendaSampleUnlockWidget extends RelativeLayout implements AdendaUn
 						mAdendaUnlockInterface.unlockAndEngage();
 				}
 			});
+	    
+	    /*
+	    View view = findViewById(R.id.date_time_frame);
+	    if (view != null)
+	    	view.setVisibility(View.GONE);
+	    */
 	}
 	
 	@SuppressLint("ClickableViewAccessibility")
 	@Override 
     public boolean onTouchEvent(MotionEvent event)
 	{
+		if (mListener != null && event != null && event.getAction() == MotionEvent.ACTION_UP)
+			mListener.onUp(event);
+		
 		if (mDetector != null)
 			mDetector.onTouchEvent(event);		
        
@@ -83,6 +97,19 @@ public class AdendaSampleUnlockWidget extends RelativeLayout implements AdendaUn
 
 	@Override
 	public void onNewImpression() {
-		Log.d(getClass().getSimpleName(), "Impression Recorded");
+		if (mAdendaUnlockInterface == null)
+			return;
+		
+		Log.d(getClass().getSimpleName(), "Impression Recorded: " + mAdendaUnlockInterface.getContentParams().getType());
+	}
+
+	@Override
+	public boolean getMaintainAspectRatio() {
+		return true;
+	}
+
+	@Override
+	public boolean getDisableBackgroundAutofill() {
+		return true;
 	}
 }
