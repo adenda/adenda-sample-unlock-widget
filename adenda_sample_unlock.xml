@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.adenda.knightsanddragons.unlock.AdendaSampleUnlockWidget
+<com.adenda.example.AdendaSampleUnlockWidget
     	xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/adenda_unlock_widget"
         android:layout_width="wrap_content"
@@ -7,4 +7,4 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:orientation="vertical" >
-</com.adenda.knightsanddragons.unlock.AdendaSampleUnlockWidget>
+</com.adenda.example.AdendaSampleUnlockWidget>

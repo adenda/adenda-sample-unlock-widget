@@ -1,4 +1,4 @@
-package com.adenda.knightsanddragons.unlock;
+package com.adenda.example;
 
 import sdk.adenda.modules.AdendaGlobal;
 import sdk.adenda.widget.AdendaUnlockInterface;
@@ -34,6 +34,9 @@ public class AdendaSampleGestureListener extends SimpleOnGestureListener
         //Log.d(getClass().getSimpleName(), "onFling: " + event1.toString()+event2.toString());
         
 		if (mAdendaUnlockInterface == null)
+			return false;
+
+		if (event1 == null || event2 == null)
 			return false;
 		
         float diffY = event1.getRawY() - event2.getRawY();
