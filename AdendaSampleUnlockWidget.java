@@ -1,30 +1,23 @@
 package com.adenda.example;
 
-import sdk.adenda.widget.AdendaUnlockInterface;
-import sdk.adenda.widget.AdendaUnlockWidget;
-import sdk.adenda.widget.DateTimeFragment;
-
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
+import sdk.adenda.widget.AdendaUnlockInterface;
+import sdk.adenda.widget.AdendaUnlockWidget;
+import sdk.adenda.widget.DateTimeFragment;
+
 public class AdendaSampleUnlockWidget extends RelativeLayout implements AdendaUnlockWidget
 {
 	private AdendaUnlockInterface mAdendaUnlockInterface;
-	private GestureDetectorCompat mDetector;
-	private AdendaSampleGestureListener mListener;
 	private Context mContext;
 
 	public AdendaSampleUnlockWidget(Context context) {
@@ -51,18 +44,11 @@ public class AdendaSampleUnlockWidget extends RelativeLayout implements AdendaUn
 	{
 		LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    inflater.inflate(R.layout.adenda_sample_unlock_layout, this);
-	    if (Activity.class.isInstance(mContext))
-	    {
-	    	mListener = new AdendaSampleGestureListener(mContext);
-	    	mDetector = new GestureDetectorCompat(mContext, mListener);
-	    }
 	}
 
 	@Override
 	public void setAdendaUnlockInterface(AdendaUnlockInterface adendaUnlockInterface) {
 		mAdendaUnlockInterface = adendaUnlockInterface;
-		if (mListener != null)
-			mListener.setAdendaUnlockInterface(adendaUnlockInterface);
 	}
 	
 	@Override
@@ -91,7 +77,7 @@ public class AdendaSampleUnlockWidget extends RelativeLayout implements AdendaUn
 		{
 			float btnHeight = pixelToDeviceIndependentPixel(getResources().getDimension(R.dimen.button_height));
 			float requiredSize = (float)(screenHeight * 0.25);
-			ViewGroup.MarginLayoutParams customContentLayoutParams = (ViewGroup.MarginLayoutParams)customContentHolder.getLayoutParams();
+			MarginLayoutParams customContentLayoutParams = (MarginLayoutParams)customContentHolder.getLayoutParams();
 			float margins = pixelToDeviceIndependentPixel(customContentLayoutParams.topMargin + customContentLayoutParams.bottomMargin);
 			// <-- Factor of DEFAULT_DATE_FACTOR is to account for the additional height of the date, which is typically ~0.27 * height of the clock.
 			// 40f to account for default padding in Text Views
@@ -107,26 +93,14 @@ public class AdendaSampleUnlockWidget extends RelativeLayout implements AdendaUn
 		if (FragmentActivity.class.isInstance(mContext))
 			((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.managed_custom_date_time_fragment_holder, DateTimeFragment.newInstance(null, dateTimeSize, null, true, true)).commitAllowingStateLoss();
 	}
-	
-	@SuppressLint("ClickableViewAccessibility")
-	@Override 
-    public boolean onTouchEvent(MotionEvent event)
-	{
-		if (mListener != null && event != null && event.getAction() == MotionEvent.ACTION_UP)
-			mListener.onUp(event);
-		
-		if (mDetector != null)
-			mDetector.onTouchEvent(event);		
-       
-        return true;
-	}
 
 	@Override
 	public void onNewImpression() {
 		if (mAdendaUnlockInterface == null)
 			return;
-		
-		Log.d(getClass().getSimpleName(), "Impression Recorded: " + mAdendaUnlockInterface.getContentParams().getType());
+
+		if (mAdendaUnlockInterface.getContentParams() != null)
+			Log.d(getClass().getSimpleName(), "Impression Recorded: " + mAdendaUnlockInterface.getContentParams().getType());
 	}
 
 	@Override
@@ -163,11 +137,7 @@ public class AdendaSampleUnlockWidget extends RelativeLayout implements AdendaUn
 	{
 		WindowManager windowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
 		DisplayMetrics metrics = new DisplayMetrics();
-		if (metrics == null)
-			return null;
-
 		windowManager.getDefaultDisplay().getMetrics(metrics);
-
 		int heightPixels = metrics.heightPixels;
 		return (float)heightPixels / metrics.density;
 	}
